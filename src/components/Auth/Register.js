@@ -1,26 +1,19 @@
 import { useState } from 'react';
-import './Login.scss';
+import './Register.scss';
 import { useNavigate } from 'react-router-dom';
-import {postLogin} from '../../services/apiService'
+import {handleRegister} from '../../services/apiService'
 import {  toast } from 'react-toastify';
 import {AiFillEye} from 'react-icons/ai'
 import {AiFillEyeInvisible} from 'react-icons/ai'
-const Login = (props) => {
+
+const Register = (props) => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [username, setUsername] = useState('')
     const [showPassword, setShowPassword] = useState(true)
-
     const navigate = useNavigate();
-    
-    const validateEmail = (email) => {
-        return String(email)
-          .toLowerCase()
-          .match(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          );
-      };
-    const handleLogin = async() => {
-        //validate
+
+    const postRegister = async() => {
         const isValidEmail = validateEmail(email);
         if (!isValidEmail) {
             toast.error('Invalid email')
@@ -30,37 +23,45 @@ const Login = (props) => {
             toast.error('Invalid password')
             return
         }
+
         //submit apis
-        let data = await postLogin(email, password)
+        let data = await handleRegister(email, password,username)
              if (data && +data.EC === 0) {
             toast.success(data.EM)
-            navigate('/admins/manage-users')
+            navigate('/login')
             }
-
+            
             if (data && +data.EC !== 0) {
             toast.error(data.EM)
             }
     }
-
-    const handleNavigateRegister = () => {
-            navigate('/register')
+    
+    const validateEmail = (email) => {
+        return String(email)
+          .toLowerCase()
+          .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          );
+      };
+    const handleNavigateLogin = () => {
+        navigate('/login')
     }
     const handleShowPassword = () => {
         setShowPassword(!showPassword)
     }
     return (
-        <div className="login-container">
+        <div className="register-container">
             <div className='header'>
                 <span>
-                    Dont have an account yet ?
+                   You have account ?
                 </span>
-                <button onClick={() => handleNavigateRegister()}>Sign up</button>
+                <button onClick={() => handleNavigateLogin()}>Sign in</button>
             </div>
             <div className='title col-4 mx-auto'>
                 Dat Nguyen
             </div>
             <div className='welcome col-4 mx-auto'>
-                Hello, who's this ?
+                One Acount, Free Feature
             </div>
             <div className='content-form col-4 mx-auto'>
                 <div className='form-group'>
@@ -69,6 +70,13 @@ const Login = (props) => {
                         className="form-control"
                         value={email}
                         onChange={(event)=> setEmail(event.target.value)}/>
+                </div>
+                <div className='form-group'>
+                        <label>Username</label>
+                        <input type={'text'} 
+                        className="form-control"
+                        value={username}
+                        onChange={(event)=> setUsername(event.target.value)}/>
                 </div>
                 <div className='form-group password-container'>
                         <label>Password</label>
@@ -84,8 +92,8 @@ const Login = (props) => {
                 <div>
                     <button 
                             className='btn-submit'
-                            onClick={() => handleLogin()}
-                            >Login to Dat Nguyen</button>
+                            onClick={() => postRegister()}
+                            >Register to Dat Nguyen</button>
                 </div>
                 <div className='text-center'>
                     <span className='back' onClick={() => {navigate('/')}}> &#60; Go to HomePage</span>
@@ -94,4 +102,4 @@ const Login = (props) => {
         </div>
     )
 }
-export default Login
+export default Register
