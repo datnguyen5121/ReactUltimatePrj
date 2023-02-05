@@ -43,4 +43,8 @@ const handleRegister = (userEmail, userPassword, userName) => {
         email: userEmail, password: userPassword, username: userName
     })
 }
-export {postCreateNewUser, getAllUsers, putUpdateUser, deleteUser, getUserWithPaginate, postLogin,handleRegister}
+const getQuizByUser = () => {
+    return axios.get(`/api/v1/quiz-by-participant`)
+}
+export {postCreateNewUser, getAllUsers, putUpdateUser, deleteUser, 
+    getUserWithPaginate, postLogin,handleRegister,getQuizByUser}
