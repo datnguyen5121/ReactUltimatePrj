@@ -1,8 +1,14 @@
 import { useEffect } from "react";
 import { useState } from "react";
 import { getAllQuizForAdmin } from "../../../../services/apiService";
+import UpdateQuiz from "./UpdateQuiz";
+import DeleteQuiz from "./DeleteQuiz";
 const TableQuiz = (props) => {
   const [listQuiz, setListQuiz] = useState([]);
+  const [showUpdateQuiz, setShowUpdateQuiz] = useState(false);
+  const [showDeleteQuiz, setShowDeleteQuiz] = useState(false);
+  const [dataUpdate, setDataUpdate] = useState({});
+  const [dataDelete, setDataDelete] = useState({});
 
   useEffect(() => {
     fetchQuiz();
@@ -14,7 +20,15 @@ const TableQuiz = (props) => {
       setListQuiz(res.DT);
     }
   };
-
+  const handleEditQuiz = (item) => {
+    console.log(item);
+    setDataUpdate(item);
+    setShowUpdateQuiz(true);
+  };
+  const handleDeleteQuiz = (item) => {
+    setDataDelete(item);
+    setShowDeleteQuiz(true);
+  };
   return (
     <>
       <div>List Quizzes: </div>
@@ -38,14 +52,30 @@ const TableQuiz = (props) => {
                   <td>{item.description}</td>
                   <td>{item.difficulty}</td>
                   <td style={{ display: "flex", gap: "15px" }}>
-                    <button className="btn btn-warning">Edit</button>
-                    <button className="btn btn-danger">Edit</button>
+                    <button className="btn btn-warning" onClick={() => handleEditQuiz(item)}>
+                      Edit
+                    </button>
+                    <button className="btn btn-danger" onClick={() => handleDeleteQuiz(item)}>
+                      Delete
+                    </button>
                   </td>
                 </tr>
               );
             })}
         </tbody>
       </table>
+      <UpdateQuiz
+        show={showUpdateQuiz}
+        setShow={setShowUpdateQuiz}
+        dataUpdate={dataUpdate}
+        fetchQuiz={fetchQuiz}
+      />
+      <DeleteQuiz
+        show={showDeleteQuiz}
+        setShow={setShowDeleteQuiz}
+        dataDelete={dataDelete}
+        fetchQuiz={fetchQuiz}
+      />
     </>
   );
 };
