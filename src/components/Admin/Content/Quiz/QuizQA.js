@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import Select from "react-select";
-import "./Question.scss";
-import {
-  getAllQuizForAdmin,
-  postCreateNewAnswerForQuiz,
-  postCreateNewQuestionForQuiz,
-} from "../../../../services/apiService";
+import "./QuizQA.scss";
+import { getQuizWithQA, getAllQuizForAdmin, postUpsertQA } from "../../../../services/apiService";
 import { TbHeartPlus } from "react-icons/tb";
 import { TbHeartMinus } from "react-icons/tb";
 import { AiOutlineMinusCircle } from "react-icons/ai";
@@ -16,13 +12,52 @@ import _ from "lodash";
 import Lightbox from "react-awesome-lightbox";
 import { toast } from "react-toastify";
 
-const Questions = (props) => {
+const QuizQA = (props) => {
   const [selectQuiz, setSelectedQuiz] = useState({});
   const [listQuiz, setListQuiz] = useState([]);
   useEffect(() => {
     fetchQuiz();
   }, []);
 
+  useEffect(() => {
+    if (selectQuiz && selectQuiz.value) {
+      fetchQuizWithQA();
+    }
+  }, [selectQuiz]);
+
+  //return a promise that resolves with a File instance
+  function urltoFile(url, filename, mimeType) {
+    return fetch(url)
+      .then(function (res) {
+        return res.arrayBuffer();
+      })
+      .then(function (buf) {
+        return new File([buf], filename, { type: mimeType });
+      });
+  }
+
+  const fetchQuizWithQA = async () => {
+    let res = await getQuizWithQA(selectQuiz.value);
+    if (res && res.EC === 0) {
+      //convert base64 to File object
+      let newQA = [];
+      for (let i = 0; i < res.DT.qa.length; i++) {
+        let q = res.DT.qa[i];
+        if (q.imageFile) {
+          q.imageName = `Question-${q.id}`;
+          q.imageFile = await urltoFile(
+            `data:image/png;base64,${q.imageFile}`,
+            `Question-${q.id}`,
+            "image/png",
+          );
+        }
+        newQA.push(q);
+      }
+      setQuestions(newQA);
+      console.log(">>> check new QA: ", newQA);
+      console.log(">>>res:", res);
+    }
+  };
   const fetchQuiz = async () => {
     let res = await getAllQuizForAdmin();
     if (res && res.EC === 0) {
@@ -206,20 +241,45 @@ const Questions = (props) => {
       toast.error(`Not empty description for Question ${indexQ1 + 1}`);
       return;
     }
-    for (const question of questions) {
-      const q = await postCreateNewQuestionForQuiz(
-        +selectQuiz.value,
-        question.description,
-        question.imageFile,
-      );
-      //submit answer
-      for (const answer of question.answers) {
-        await postCreateNewAnswerForQuiz(answer.description, answer.isCorrect, q.DT.id);
+    // for (const question of questions) {
+    //   const q = await postCreateNewQuestionForQuiz(
+    //     +selectQuiz.value,
+    //     question.description,
+    //     question.imageFile,
+    //   );
+    //   //submit answer
+    //   for (const answer of question.answers) {
+    //     await postCreateNewAnswerForQuiz(answer.description, answer.isCorrect, q.DT.id);
+    //   }
+    // }
+    let questionClone = _.cloneDeep(questions);
+    for (let i = 0; i < questionClone.length; i++) {
+      if (questionClone[i].imageFile) {
+        questionClone[i].imageFile = await toBase64(questionClone[i].imageFile);
       }
     }
-    toast.success("Create questions and answers succeed");
-    setQuestions(initQuestions);
+    let res = await postUpsertQA({
+      quizId: selectQuiz.value,
+      questions: questionClone,
+    });
+    console.log("check questionClone", questionClone);
+
+    if (res && res.EC === 0) {
+      toast.success(res.EM);
+      fetchQuizWithQA();
+    }
+    // toast.success("Create questions and answers succeed");
+    // setQuestions(initQuestions);
   };
+
+  const toBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+
   const handlePreviewImage = (questionId) => {
     let questionClone = _.cloneDeep(questions);
     let index = questionClone.findIndex((item) => item.id === questionId);
@@ -231,10 +291,9 @@ const Questions = (props) => {
       setIsPreviewImage(true);
     }
   };
+  console.log(">>> check questions: ", questions);
   return (
     <div className="questions-container">
-      <div className="title">Manage Questions</div>
-      <hr />
       <div className="add-new-question">
         <div className="col-6 form-group">
           <label className="mb-2">Select Quiz:</label>
@@ -367,4 +426,4 @@ const Questions = (props) => {
     </div>
   );
 };
-export default Questions;
+export default QuizQA;
