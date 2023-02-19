@@ -8,6 +8,7 @@ import { AiFillEyeInvisible } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import { doLogin } from "../../redux/action/userAction";
 import { ImSpinner10 } from "react-icons/im";
+import Language from "../Header/Language";
 const Login = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -67,6 +68,7 @@ const Login = (props) => {
       <div className="header">
         <span>Dont have an account yet ?</span>
         <button onClick={() => handleNavigateRegister()}>Sign up</button>
+        <Language />
       </div>
       <div className="title col-4 mx-auto">Dat Nguyen</div>
       <div className="welcome col-4 mx-auto">Hello, who's this ?</div>

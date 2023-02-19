@@ -11,6 +11,7 @@ import Layout from "./Layout";
 import "nprogress/nprogress.css";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import "react-awesome-lightbox/build/style.css";
+import i18n from "./utils/i18n";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>

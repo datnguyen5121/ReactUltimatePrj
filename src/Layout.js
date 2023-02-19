@@ -15,6 +15,7 @@ import ManageQuiz from "./components/Admin/Content/Quiz/ManageQuiz";
 import Questions from "./components/Admin/Content/Question/Questions";
 import Test1 from "./routes/Test1";
 import PrivateRoute from "./routes/PrivateRoute";
+import React, { Suspense } from "react";
 const NotFound = () => {
   return (
     <div className="container mt-3 alert alert-danger">Not found data with your current URL</div>
@@ -22,7 +23,7 @@ const NotFound = () => {
 };
 const Layout = (props) => {
   return (
-    <>
+    <Suspense fallback="...is loading">
       <Routes>
         <Route path="/" element={<App />}>
           <Route index element={<HomePage />} />
@@ -69,7 +70,7 @@ const Layout = (props) => {
         pauseOnHover
         theme="light"
       />
-    </>
+    </Suspense>
   );
 };
 

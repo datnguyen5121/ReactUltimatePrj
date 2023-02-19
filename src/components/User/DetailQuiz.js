@@ -40,6 +40,7 @@ const DetailQuiz = (props) => {
             answers.push(item.answers);
             // console.log('item answers: ',item.answers);
           });
+          answers = _.orderBy(answers, ["id"], ["asc"]);
           return { questionId: key, answers, questionDescription, image };
         })
         .value();
