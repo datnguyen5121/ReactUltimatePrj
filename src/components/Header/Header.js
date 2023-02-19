@@ -8,6 +8,7 @@ import { logout } from "../../services/apiService";
 import { toast } from "react-toastify";
 import { doLogout } from "../../redux/action/userAction";
 import Language from "./Language";
+import { FaReact } from "react-icons/fa";
 const Header = () => {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   const dispatch = useDispatch();
@@ -34,6 +35,7 @@ const Header = () => {
     <Navbar bg="light" expand="lg">
       <Container>
         <NavLink to="/" className="navbar-brand">
+          <FaReact className="brand-icon" />
           Hoi Dan It
         </NavLink>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

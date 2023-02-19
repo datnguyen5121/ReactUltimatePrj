@@ -7,6 +7,7 @@ import Question from "./Question";
 import { useState } from "react";
 import ModalResult from "./ModalResult";
 import RightContent from "./RightContent/RightContent";
+import { Breadcrumb, NavLink } from "react-bootstrap";
 const DetailQuiz = (props) => {
   const params = useParams();
   const location = useLocation();
@@ -111,43 +112,54 @@ const DetailQuiz = (props) => {
     console.log(arr);
   };
   return (
-    <div className="detail-quiz-container">
-      <div className="left-content">
-        <div className="title">
-          Quiz {quizId}: {location?.state?.quizTitle}
+    <>
+      <Breadcrumb className="quiz-detail-new-header">
+        <NavLink to="/" className="breadcrumb-item"></NavLink>
+        <NavLink to="/users" className="breadcrumb-item"></NavLink>
+        <Breadcrumb.Item active></Breadcrumb.Item>
+      </Breadcrumb>
+      <div className="detail-quiz-container">
+        <div className="left-content">
+          <div className="title">
+            Quiz {quizId}: {location?.state?.quizTitle}
+          </div>
+          <hr />
+          <div className="q-body">
+            <img />
+          </div>
+          <div className="q-content">
+            <Question
+              data={dataQuiz && dataQuiz.length > 0 ? dataQuiz[index] : []}
+              index={index}
+              handleCheckbox={handleCheckbox}
+            />
+          </div>
+          <div className="footer">
+            <button className="btn btn-secondary" onClick={() => handlePrev()}>
+              Prev
+            </button>
+            <button onClick={() => handleNext()} className="btn btn-primary ">
+              Next
+            </button>
+            <button onClick={() => handleFinishQuiz()} className="btn btn-warning ">
+              Finish
+            </button>
+          </div>
         </div>
-        <hr />
-        <div className="q-body">
-          <img />
-        </div>
-        <div className="q-content">
-          <Question
-            data={dataQuiz && dataQuiz.length > 0 ? dataQuiz[index] : []}
-            index={index}
-            handleCheckbox={handleCheckbox}
+        <div className="right-content">
+          <RightContent
+            dataQuiz={dataQuiz}
+            handleFinishQuiz={handleFinishQuiz}
+            setIndex={setIndex}
           />
         </div>
-        <div className="footer">
-          <button className="btn btn-secondary" onClick={() => handlePrev()}>
-            Prev
-          </button>
-          <button onClick={() => handleNext()} className="btn btn-primary ">
-            Next
-          </button>
-          <button onClick={() => handleFinishQuiz()} className="btn btn-warning ">
-            Finish
-          </button>
-        </div>
+        <ModalResult
+          show={isShowModalResult}
+          setShow={setIsShowModalResult}
+          dataModalResult={dataModalResult}
+        />
       </div>
-      <div className="right-content">
-        <RightContent dataQuiz={dataQuiz} handleFinishQuiz={handleFinishQuiz} setIndex={setIndex} />
-      </div>
-      <ModalResult
-        show={isShowModalResult}
-        setShow={setIsShowModalResult}
-        dataModalResult={dataModalResult}
-      />
-    </div>
+    </>
   );
 };
 export default DetailQuiz;
