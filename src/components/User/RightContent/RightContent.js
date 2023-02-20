@@ -9,11 +9,11 @@ const RightContent = (props) => {
   };
   console.log("dataQuiz:", dataQuiz);
   const getClassQuestion = (index, question) => {
-    console.log(index, question);
+    // console.log(index, question);
     //check answered
     if (question && question.answers.length > 0) {
       let isAnswered = question.answers.find((a) => a.isSelected === true);
-      console.log("index", index, isAnswered);
+      // console.log("index", index, isAnswered);
       if (isAnswered) {
         return "question selected";
       }
@@ -23,7 +23,7 @@ const RightContent = (props) => {
   const handleClickQuestion = (question, index) => {
     props.setIndex(index);
     if (refDiv.current) {
-      console.log("refDiv.current", refDiv.current);
+      // console.log("refDiv.current", refDiv.current);
       refDiv.current.forEach((item) => {
         if (item && item.className === "question clicked") {
           item.className = "question";
@@ -33,7 +33,7 @@ const RightContent = (props) => {
 
     if (question && question.answers.length > 0) {
       let isAnswered = question.answers.find((a) => a.isSelected === true);
-      console.log("index", index, isAnswered);
+      // console.log("index", index, isAnswered);
       if (isAnswered) {
         return "question selected";
       }

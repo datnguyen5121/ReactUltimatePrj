@@ -13,11 +13,14 @@ const DetailQuiz = (props) => {
   const location = useLocation();
   const quizId = params.id;
 
-  const [dataQuiz, setdataQuiz] = useState([]);
+  const [dataQuiz, setDataQuiz] = useState([]);
   const [index, setIndex] = useState(0);
 
   const [isShowModalResult, setIsShowModalResult] = useState(false);
   const [dataModalResult, setDataModalResult] = useState({});
+
+  const [isFinish, setIsFinish] = useState(false);
+  const [showAnwers, setShowAnwers] = useState(false);
   useEffect(() => {
     fetchQuestions();
   }, [quizId]);
@@ -38,6 +41,8 @@ const DetailQuiz = (props) => {
               image = item.image;
             }
             item.answers.isSelected = false;
+            item.answers.isCorrect = false;
+
             answers.push(item.answers);
             // console.log('item answers: ',item.answers);
           });
@@ -45,7 +50,7 @@ const DetailQuiz = (props) => {
           return { questionId: key, answers, questionDescription, image };
         })
         .value();
-      setdataQuiz(data);
+      setDataQuiz(data);
       // console.log('check dataquiz: ', data);
     }
   };
@@ -71,7 +76,7 @@ const DetailQuiz = (props) => {
     let index = dataQuizClone.findIndex((item) => +item.questionId === +questionId);
     if (index > -1) {
       dataQuizClone[index] = question;
-      setdataQuiz(dataQuizClone);
+      setDataQuiz(dataQuizClone);
     }
   };
   const handleFinishQuiz = async () => {
@@ -93,30 +98,59 @@ const DetailQuiz = (props) => {
           userAnswerId: userAnswerId,
         });
       });
-      console.log(arrNew);
       arr.answers = arrNew;
 
       let res = await postSubmitQuiz(arr);
       console.log("check res: ", res);
       if (res && res.EC === 0) {
+        setIsFinish(true);
+
         setDataModalResult({
           countCorrect: res.DT.countCorrect,
           countTotal: res.DT.countTotal,
           quizData: res.DT.quizData,
         });
         setIsShowModalResult(true);
+
+        //update isCorrect
+        if (res.DT && res.DT.quizData) {
+          let dataQuizClone = _.cloneDeep(dataQuiz);
+          let a = res.DT.quizData;
+          for (let q of a) {
+            for (let i = 0; i < dataQuizClone.length; i++) {
+              if (+q.questionId === +dataQuizClone[i].questionId) {
+                //update answer
+                let newAnswers = [];
+                for (let j = 0; j < dataQuizClone[i].answers.length; j++) {
+                  let s = q.systemAnswers.find(
+                    (item) => +item.id === +dataQuizClone[i].answers[j].id,
+                  );
+                  if (s) {
+                    dataQuizClone[i].answers[j].isCorrect = true;
+                  }
+                  newAnswers.push(dataQuizClone[i].answers[j]);
+                }
+                dataQuizClone[i].answers = newAnswers;
+              }
+            }
+          }
+          setDataQuiz(dataQuizClone);
+        }
       } else {
         alert("something wrongs....");
       }
     }
-    console.log(arr);
   };
   return (
     <>
       <Breadcrumb className="quiz-detail-new-header">
-        <NavLink to="/" className="breadcrumb-item"></NavLink>
-        <NavLink to="/users" className="breadcrumb-item"></NavLink>
-        <Breadcrumb.Item active></Breadcrumb.Item>
+        <NavLink to="/" className="breadcrumb-item">
+          Home
+        </NavLink>
+        <NavLink to="/users" className="breadcrumb-item">
+          User
+        </NavLink>
+        <Breadcrumb.Item active>Quiz</Breadcrumb.Item>
       </Breadcrumb>
       <div className="detail-quiz-container">
         <div className="left-content">
@@ -129,6 +163,9 @@ const DetailQuiz = (props) => {
           </div>
           <div className="q-content">
             <Question
+              isFinish={isFinish}
+              showAnwers={showAnwers}
+              setShowAnwers={setShowAnwers}
               data={dataQuiz && dataQuiz.length > 0 ? dataQuiz[index] : []}
               index={index}
               handleCheckbox={handleCheckbox}
@@ -141,7 +178,11 @@ const DetailQuiz = (props) => {
             <button onClick={() => handleNext()} className="btn btn-primary ">
               Next
             </button>
-            <button onClick={() => handleFinishQuiz()} className="btn btn-warning ">
+            <button
+              disabled={isFinish}
+              onClick={() => handleFinishQuiz()}
+              className="btn btn-warning "
+            >
               Finish
             </button>
           </div>
@@ -154,6 +195,8 @@ const DetailQuiz = (props) => {
           />
         </div>
         <ModalResult
+          showAnwers={showAnwers}
+          setShowAnwers={setShowAnwers}
           show={isShowModalResult}
           setShow={setIsShowModalResult}
           dataModalResult={dataModalResult}

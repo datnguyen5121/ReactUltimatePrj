@@ -1,9 +1,11 @@
 import _ from "lodash";
 import { useState } from "react";
 import Lightbox from "react-awesome-lightbox";
+import { BsCheck2 } from "react-icons/bs";
+import { BsXLg } from "react-icons/bs";
 
 const Question = (props) => {
-  const { data, index } = props;
+  const { data, index, showAnwers } = props;
   const [isPreviewImage, setIsPreviewImage] = useState(false);
   if (_.isEmpty(data)) {
     return <></>;
@@ -47,11 +49,18 @@ const Question = (props) => {
                   <input
                     className="form-check-input"
                     type="checkbox"
+                    disabled={props.isFinish}
                     checked={a.isSelected}
                     value=""
                     onChange={(event) => handHandleCheckbox(event, a.id, data.questionId)}
                   />
                   <label className="form-check-label">{a.description}</label>
+                  {showAnwers === true && (
+                    <>
+                      {a.isSelected === true && a.isCorrect === false && <BsXLg />}
+                      {a.isCorrect === true && <BsCheck2 />}
+                    </>
+                  )}
                 </div>
               </div>
             );

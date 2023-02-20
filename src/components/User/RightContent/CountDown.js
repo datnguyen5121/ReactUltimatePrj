@@ -2,7 +2,7 @@ import { min } from "lodash";
 import { useState, useEffect } from "react";
 
 const CountDown = (props) => {
-  const [count, setCount] = useState(10);
+  const [count, setCount] = useState(1000);
 
   useEffect(() => {
     if (count === 0) {
